@@ -1,0 +1,5 @@
+<template name="demob">
+  <view style='color:blue'>
+   templateb
+  </view>
+</template>

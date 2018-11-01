@@ -1,0 +1,5 @@
+<!--components/acom/acom.wxml-->
+<view style='background-color:red'>
+<text bindtap="_changeBe">三姓家奴</text>
+<text >{{myBehaviorData}}</text>
+</view>

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "选择基础库",
+  "usingComponents": {
+    "mycomponent": "/components/mycomponent/mycomponent",
+    "acom": "/components/acom/acom"
+  }
+  
+}

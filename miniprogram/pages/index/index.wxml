@@ -1,0 +1,66 @@
+<!--index.wxml-->
+
+<view class="container">
+
+  <!-- 用户 openid -->
+  <view class="userinfo">
+    <button 
+      open-type="getUserInfo" 
+      class="userinfo-avatar"
+      style="background-image: url({{avatarUrl}})"
+    ></button>
+    <view>
+      <button wx:if="{{auth==1}}" class="userinfo-nickname" >hello world</button>
+      <button wx:else class="userinfo-nickname" open-type="getUserInfo">登录授权</button>
+    </view>
+  </view>
+
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='1'>条件渲染与模板</button>
+  </view>
+
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='2'>wsx,另一种js的写法</button>
+  </view>
+
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='3'>自定义组件以及事件传递</button>
+  </view>
+
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='4'>网络请求</button>
+  </view>
+
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='5'>本地缓存</button>
+  </view>
+
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='6'>发送带参数的消息模板（需要真机）</button>
+  </view>
+
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='7'>图片上传下载，小程序二维码</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='8'>店铺分享图片机制</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='9'>商品分享图片机制</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='10'>客服消息</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='11'>分享给朋友（分享到朋友圈不通）</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='12'>埋点测试</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='13'>手机号</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='14'>沙雕实验室</button>
+  </view>
+  </view>

@@ -1,0 +1,6 @@
+var con = function () {
+  console.log('this is testb.wxs');
+}
+module.exports = {
+  con: con
+};

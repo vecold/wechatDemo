@@ -1,0 +1,7 @@
+/* components/component-tag-name.wxss */
+.a{
+  color:red
+}
+.wrapper{
+  background-color: yellow
+}

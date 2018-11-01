@@ -1,0 +1,12 @@
+<!-- 组件模板 -->
+<view class="wrapper">
+  <view>这里是组件的内部节点</view>
+  <text class='a' bindtap="_myPrivateMethod" data-type='事件参数'>{{propa}}</text>
+  <text bindtap="_changeBe">{{propB}}</text>
+  <slot name="before"></slot>
+  <slot name="after"></slot>
+  <acom></acom>
+  <text>{{myBehaviorData}}</text>
+  <button bindtap="_onTap">点击这个按钮将触发“myevent”事件</button>
+  <button bindtap='_tapOne'>点我一下</button>
+</view>

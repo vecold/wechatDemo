@@ -1,0 +1,123 @@
+<!--pages/chooseLib/chooseLib.wxml-->
+<import src="../../components/testdemo/test.wxml"/>
+<wxs src="../../biz/test.wxs" module="tools" />
+<block wx:if='{{demo==1}}' >
+  <view class="container">
+    <text class="title">{{demotext}}</text>
+    <view wx:key="message" wx:for="{{array}}">
+      <template is="demo" data="{{index:index,...item}}"></template>
+    </view>
+    <text hidden="{{false}}">有个界面</text>
+    <text class="title">九九乘法表</text>
+    <!-- 九九乘法表 -->
+    <view wx:for="{{[1, 2, 3, 4, 5, 6, 7, 8, 9]}}" wx:for-item="i" wx:key="i" >
+      <view wx:for="{{[1, 2, 3, 4, 5, 6, 7, 8, 9]}}" wx:for-item="j" wx:key="j" >
+        <view wx:if="{{i <= j}}">
+          {{i}} * {{j}} = {{i * j}}
+        </view>
+      </view>
+    </view>
+  </view>
+</block>
+<block wx:if='{{demo==2}}' >
+  <view class="container">
+  <view> {{tools.msg}} </view>
+  <view> {{tools.bar(tools.foo)}} </view>
+  </view>
+</block>
+
+<view style='background-color:white' wx:if='{{demo==3}}'>
+    <view  wx:if='{{mycomponent==1}}'>
+      <mycomponent bind:myevent="onMyEvent" id='mycomponent' propa="{{dataFieldA}}" prop-b="{{dataFieldB}}">
+        <view slot="before">before</view>
+        <view slot="after">after</view>
+      </mycomponent>
+      <text bindtap="destroy" data-type='0'> 自我销毁</text>
+    </view>
+    <text bindtap="destroy" data-type='1' wx:else>重新出现</text>
+    <acom></acom>
+    <text bindtap="getcomponent" >获取组件信息</text>
+</view>
+
+<view wx:if='{{demo==4}}'>
+  <button bindtap='posthttp'>post请求</button>
+  <button bindtap='gethttp'>get请求</button>
+</view>
+
+<view wx:if='{{demo==5}}'>
+  key:<input  bindinput="bindKeyInput" data-type='savekey'></input>
+  data:<input bindinput="bindKeyInput" data-type='savedata'></input>
+  <button bindtap='datatran' data-type='save'>存</button>
+  key:<input bindinput="bindKeyInput" data-type='getkey'></input>
+  <button bindtap='datatran' data-type='get'>取</button>
+  <view>{{getdata}}</view>
+  key:<input bindinput="bindKeyInput" data-type='removekey'>></input>
+  <button bindtap='datatran' data-type='remove'>移除</button>
+  <button bindtap='datatran' data-type='clear'>清空</button>
+</view>
+
+<view wx:if='{{demo==6}}'>
+  <form report-submit="true" bindsubmit="formSubmit" bindreset="formReset">
+    <button formType="submit">发送</button>
+</form>
+</view>
+
+
+<view wx:if='{{demo==7}}'>
+  <button bindtap='doUpload'>上传图片</button>
+  <view wx:if='{{upload==1}}'>
+      <text>上传成功</text>
+      <text >文件 ID：{{fileID}}</text>
+      <text >云文件路径：{{cloudPath}}</text>
+      <image src="{{imagePath}}" data-src="{{imagePath}}" mode="aspectFit" bindtap="previewImage"></image>
+  </view>
+  <button bindtap='picJude'>图片审核</button>
+  <button bindtap='doDownload'>下载图片</button>
+  <button bindtap='judemsg'>jaince</button>
+  <button bindtap='getqrcode'>小程序二维码</button>
+  <image src='{{qrcode}}'></image>
+</view>
+
+<view wx:if='{{demo==8}}'>
+  <canvas class='canvasA' canvas-id="myCanvas" ></canvas>
+  <button bindtap='testpic'>绘画图片</button>
+  <button class='share' type='primary' bindtap='share'>生成分享图</button>
+  <view>
+    <image style='width:553rpx;height:665rpx;' src='{{prurl}}'></image>
+    <button type='primary' size='mini' bindtap='save'>保存分享图</button>
+  </view>
+</view>
+
+<view wx:if='{{demo==9}}'>
+  <canvas class='canvasB' canvas-id="item" ></canvas>
+  <button bindtap='itempic'>绘画图片</button>
+  <button class='share' type='primary' bindtap='itemshare'>生成分享图</button>
+  <view>
+    <image style='width:548rpx;height:974rpx;' src='{{itemprurl}}'></image>
+    <button type='primary' size='mini' bindtap='itemsave'>保存分享图</button>
+  </view>
+</view>
+<!-- 暂时全使用微信提供的页面 -->
+<view wx:if='{{demo==10}}'>
+  <button open-type="contact" bindcontact="handleContact">客服消息</button> 
+</view>
+
+<!-- 注意页面监听事件onShareAppMessage时间 -->
+<view wx:if='{{demo==11}}'>
+  <!-- <web-view src="https://q.aiyongbao.com/cx1688/src/onh.html"></web-view> -->
+  <button open-type="share">分享给朋友</button> 
+  <!-- <button open-type="openurl">打开H5页面</button>  -->
+</view>
+
+<view wx:if='{{demo==12}}'>
+  <button bindtap="dobean">埋点测试</button> 
+</view>
+<view wx:if='{{demo==13}}'>
+  <button bindtap="testurl">url测试</button> 
+  <button bindgetphonenumber="getphone" open-type="getPhoneNumber">获取手机号码</button> 
+</view>
+<scroll-view style='height:100%' bindscroll='viewmove' wx:if='{{demo==14}}' scroll-y>
+  <view id='de2'>查看详情</view>
+  <button bindtap='getsys'>系统信息</button>
+  
+</scroll-view>

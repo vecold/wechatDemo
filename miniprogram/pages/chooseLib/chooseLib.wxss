@@ -1,0 +1,26 @@
+/* pages/chooseLib/chooseLib.wxss */
+
+@import "../../style/common.wxss";
+
+.black {
+  color: black;
+}
+.title {
+  color:#ff6600;
+  font-size: 42rpx
+}
+
+.canvasA{
+  margin-left: 109rpx;
+  width:533rpx;
+  height:665rpx;
+  background-color: white;
+}
+
+.canvasB{
+  margin-left: 109rpx;
+  width:548rpx;
+  height:974rpx;
+  background-color: white;
+}
+/* 画布绘制过程不能隐藏 但是又不能被用户看见 所以定位在用户看不到地方 */

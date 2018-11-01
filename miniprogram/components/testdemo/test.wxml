@@ -1,0 +1,7 @@
+<import src="./testb.wxml"/>
+<template name="demo">
+  <view>
+    <text class='test'>index:{{index}} message: {{message}}</text>
+  </view>
+  <template is="demob" ></template>
+</template>
