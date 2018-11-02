@@ -1,5 +1,5 @@
 // pages/chooseLib/chooseLib.js
-import { api, local, choosepic, upload, downloadPic, getQrcode, drawShopPic, getShopPic, drawItemPic } from '../../public/tools/index.js';
+import { navigate,api, local, choosepic, upload, downloadPic, getQrcode, drawShopPic, getShopPic, drawItemPic } from '../../public/tools/index.js';
 import { sendTempale, getTempale } from '../../biz/tempale.js';
 import { getshops, getitems, collect, showCollect } from '../../biz/getShops.js'
 Page({
@@ -23,7 +23,8 @@ Page({
     removekey: '',
     getkey: '',
     getdata: '',
-    qrcode:''
+    qrcode:'',
+    imgUrls: ["https://cbu01.alicdn.com/img/ibank/2011/697/511/384115796_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/812/699/4146996218_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/914/064/4169460419_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/527/820/4165028725_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/419/610/4165016914_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/345/002/4166200543_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/062/602/4166206260_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/567/491/4166194765_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/709/369/4146963907_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/447/149/4172941744_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/243/059/4172950342_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/929/930/4176039929_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/719/449/4172944917_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/450/360/4176063054_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/669/706/4171607966_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/706/059/4172950607_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/887/240/4176042788_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/284/150/4176051482_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2017/824/840/4176048428_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2011/547/511/384115745_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2011/807/431/384134708_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2011/438/511/384115834_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2011/527/311/384113725_1401670587.jpg", "https://cbu01.alicdn.com/img/ibank/2011/470/441/384144074_1401670587.jpg"]
   },
   onShareAppMessage: function (options){
     console.log(options);//options看文档
@@ -456,5 +457,11 @@ Page({
         console.log(res)
       },
     })
+  },
+  navtoindex:function(e){
+    navigate({
+      url: '/pages/index/index',
+      type: 'push'
+    });
   }
 })

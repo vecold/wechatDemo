@@ -2,7 +2,8 @@
   "navigationBarTitleText": "选择基础库",
   "usingComponents": {
     "mycomponent": "/components/mycomponent/mycomponent",
-    "acom": "/components/acom/acom"
+    "acom": "/components/acom/acom",
+    "piccom": "/components/piccom/piccom"
   }
   
 }

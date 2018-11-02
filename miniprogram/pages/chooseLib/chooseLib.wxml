@@ -116,8 +116,6 @@
   <button bindtap="testurl">url测试</button> 
   <button bindgetphonenumber="getphone" open-type="getPhoneNumber">获取手机号码</button> 
 </view>
-<scroll-view style='height:100%' bindscroll='viewmove' wx:if='{{demo==14}}' scroll-y>
-  <view id='de2'>查看详情</view>
-  <button bindtap='getsys'>系统信息</button>
-  
+<scroll-view wx:for="{{imgUrls}}"  wx:key="{{index}}" style='height:100%'  wx:if='{{demo==14}}' scroll-y>
+  <piccom  imagePath="{{item}}"></piccom>
 </scroll-view>
