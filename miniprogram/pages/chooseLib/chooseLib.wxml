@@ -100,6 +100,10 @@
 <!-- 暂时全使用微信提供的页面 -->
 <view wx:if='{{demo==10}}'>
   <button open-type="contact" bindcontact="handleContact">客服消息</button> 
+  <button style='display:flex;flex-direction:column;padding:none;margin:none'>
+    <view style='background-color:red;width:20rpx;height:20rpx;'></view>
+    <text>button</text>
+  </button>
 </view>
 
 <!-- 注意页面监听事件onShareAppMessage时间 -->
@@ -119,3 +123,9 @@
 <scroll-view wx:for="{{imgUrls}}"  wx:key="{{index}}" style='height:100%'  wx:if='{{demo==14}}' scroll-y>
   <piccom  imagePath="{{item}}"></piccom>
 </scroll-view>
+<view wx:if='{{demo==15}}'>
+  <datepicker >
+    <button type='default'>公历</button>
+  </datepicker> 
+  <button bindtap='helloclib'>ctrl+c</button>
+</view>

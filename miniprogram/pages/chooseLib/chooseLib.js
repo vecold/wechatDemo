@@ -1,7 +1,8 @@
 // pages/chooseLib/chooseLib.js
 import { navigate,api, local, choosepic, upload, downloadPic, getQrcode, drawShopPic, getShopPic, drawItemPic } from '../../public/tools/index.js';
 import { sendTempale, getTempale } from '../../biz/tempale.js';
-import { getshops, getitems, collect, showCollect } from '../../biz/getShops.js'
+import { getshops, getitems, collect, showCollect } from '../../biz/getShops.js';
+
 Page({
 
   /**
@@ -463,5 +464,21 @@ Page({
       url: '/pages/index/index',
       type: 'push'
     });
+  },
+  helloclib:function(e){
+    wx.setClipboardData({
+      data: 'data',
+      success(res) {
+        wx.showToast({
+          title: '你是真的皮',
+          icon:'none'
+        })
+        wx.getClipboardData({
+          success(res) {
+            console.log(res.data) // data
+          }
+        })
+      }
+    })
   }
 })

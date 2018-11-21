@@ -3,7 +3,7 @@
   "usingComponents": {
     "mycomponent": "/components/mycomponent/mycomponent",
     "acom": "/components/acom/acom",
-    "piccom": "/components/piccom/piccom"
+    "piccom": "/components/piccom/piccom",
+    "datepicker": "/miniprogram_npm/miniprogram-datepicker/index"
   }
-  
 }
