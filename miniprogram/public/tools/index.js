@@ -394,6 +394,9 @@ function getQrcode({ sence, page, callback }) {
     src: 'https://devweb1688.aiyongbao.com/wx/xcxQrcode?str=' + sence + '&page=' + page,
     success: (res) => {
       callback(res.path);
+    },
+    complete:(res)=>{
+      console.log(res)
     }
   });
 }

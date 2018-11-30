@@ -215,19 +215,21 @@ Page({
   formSubmit: function (e) {
     //要真机
     let formId = e.detail.formId;
-    getTempale((res)=>{
-      let template_id = res[0].template_id;//选择模板
-      sendTempale({
-        nick1688: '上海爱用宝软件',
-        template_id: template_id,
-        page:'pages/index/index?word=hello',
-        form_id: formId,
-        keyword: ['20181016','hello'],
-        callback:(res)=>{
-          console.log(res)
+    // getTempale((res)=>{
+      api({
+        url: '/wx/sendTempale',
+        method: 'post',
+        params: {
+          type:'seller',
+          shopid:'47361',
+          // form_id: formId,
+          // keyword: ['123123','1','2','3','4'],
+          page: 'pages/index/index?sence=1'
+        },
+        callback: res => {
         }
       });
-    })
+    // })
     console.log('form发生了submit事件，携带数据为：', e.detail.formId)
   },
   formReset: function () {
@@ -283,7 +285,7 @@ Page({
   getqrcode:function (){
     getQrcode({
       sence:'hello',
-      page:'pages/index/index',
+      page:'pages/login/login',
       callback:(res)=>{
         this.setData({ qrcode: res});
       }
@@ -292,7 +294,7 @@ Page({
   testpic:function (){
     drawShopPic({     ava:'https://wx.qlogo.cn/mmopen/vi_32/icaYhiapVcmsz8GYm4dwHxen5iaACEgZpd7hE8V8xib8AFedeb1xCgbxP8DsS9q3YzH8NqD6GBSJBMRw2yRUH79jaQ/132',
       sence:'hello', 
-      page:'pages/index/index', 
+      page:'pages/login/login', 
       shopname:'品质家居生活馆', 
       canvasID:'myCanvas'
       });
@@ -326,7 +328,7 @@ Page({
     drawItemPic({
       ava: 'https://cbu01.alicdn.com/img/order/trading/320/655/156406499332/8533673508_1376380072.80x80.jpg_60x60.jpg',
       sence: 'hello',
-      page: 'pages/index/index',
+      page: 'pages/login/login',
       itemtitle: '创意小丁玻璃杯 高硼硅水杯耐高温玻璃杯 可定制广告礼品',
       money:'¥40.00',
       canvasID: 'item'
