@@ -64,6 +64,19 @@
     <button class="userinfo-nickname" bindtap='showDemo' data-demo='14'>图片秒加载</button>
   </view>
   <view class="userinfo">
-    <button class="userinfo-nickname" bindtap='showDemo' data-demo='15'>沙雕实验室</button>
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='15'>npm的使用</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='16'>微信支付相关</button>
+  </view>
+  <view class="userinfo">
+    <button class="userinfo-nickname" bindtap='showDemo' data-demo='17'>主图动画以及商品发布</button>
+  </view>
+  <view class="userinfo">
+  <button class="userinfo-nickname" bindtap='showDemo' data-demo='19'>修改金额</button>
+  </view>
+  <view class="userinfo">
+  <button class="userinfo-nickname" bindtap='showDemo' data-demo='18'>沙雕实验室</button>
   </view>
   </view>
+

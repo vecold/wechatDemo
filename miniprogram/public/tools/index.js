@@ -1,9 +1,59 @@
 import { domain } from '../../biz/env.js';
+import { DeAes2,Decrypt,Encrypt,productionToken,objKeySort } from   '../tools/Secret.js'
+const  qurlimg = 'https://q.aiyongbao.com/wechat/images/';
 
-function sayHello(name) {
-  console.log(`Hello ${name} !`)
+
+function cloud({name='',params={},callback}){
+  wx.cloud.callFunction({
+    name: name,
+    data: params,
+    success(res) {
+      if (callback){
+        callback(res);
+      }
+    },
+    complete: res => {
+      console.log('callFunction test result: ', res)
+    },
+    fail: console.error
+  })
 }
 
+/**
+ * https://developers.weixin.qq.com/minigame/dev/api/wx.saveImageToPhotosAlbum.html
+ * 保存图片到系统相册。
+ * @params filePath 图片文件路径，可以是临时文件路径或永久文件路径，不支持网络图片路径 必填
+ * 
+ */
+function saveImageToPhotosAlbum({ filePath, successText = "保存成功！", errorText = "保存失败！"},successCallback,errorCallback=undefined){
+    wx.saveImageToPhotosAlbum({
+        filePath: filePath,
+        success: (res) => {
+            if (!IsEmpty(successText)){
+                wx.showToast({
+                    title: successText,
+                    icon: 'none',
+                    mask: true,
+                    duration: 2000
+                });
+            }
+            successCallback(res);
+        },
+        fail:(error)=>{
+            if (!IsEmpty(errorText)) {
+                wx.showToast({
+                    title: errorText,
+                    icon: 'none',
+                    mask: true,
+                    duration: 2000
+                });
+            }
+            if (!IsEmpty(errorCallback)) {
+                errorCallback(error);
+            }
+        }
+    })
+}
 /*
   喜闻乐见的IsEmpty
 */
@@ -141,41 +191,108 @@ function buildStr(data) {
   return str.substr(0, str.length - 1);
 }
 
-
-
-function api({ host = domain.devhost, url, method = 'get', params, callback, errorcallback }) {
-  let args = '';
-  let datatype = method == 'get' ? 'application/json' : 'application/x-www-form-urlencoded';
-  if (method == 'get') {
-    args = buildStr(params);
-    if (args != '') {
-      args = '?' + args;
-    }
-  }
+function api({ host = domain.zhost, url, method = 'post', params = {}, callback, errorcallback }) {
+  let self = this;
+  params.rd_session = local({ type: 'get', key: 'rd_session' });
+  //请求参数转为JSON字符串
+  var jsonStr = JSON.stringify(params);
+  //根据特定规则生成Token
+  var token = productionToken(params);
+  //加密请求参数
+  var aesData = Encrypt(jsonStr)
   wx.request({
-    url: host + url + args,
+    url: host+url,
     method: method,
-    dataType: method == 'get' ? 'jsonp' : 'json',
-    data: method == 'get' ? {} : params,
     header: {
-      'content-type': datatype
+      'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+      'Token': token
     },
-    success(res) {
-      console.log(res)
-      if (method == 'get') {
-        callback(JSON.parse(res.data))
-      } else {
-        callback(res.data)
+    data: {
+      aesData: aesData
+    },
+    // data: params,
+    success: function (res) {
+      //判断请求结果是否成功
+      try {
+        let data = res.data;
+        var result = DeAes2(data);
+        if (!IsEmpty(result)) {
+          data = JSON.parse(result);
+        }
+        console.log(data)
+        if (!IsEmpty(data.code) && data.code != 200) {
+          wx.showToast({
+            title: data.value,
+            icon: 'none'
+          })
+          return;
+        } else {
+          if(!IsEmpty(callback)){
+            callback(data)
+          }
+        }
+      } catch (e) {
+        console.warn(e)
       }
     },
-    fail(res) {
-      console.error(res)
-    }
+    fail: function (res) {
+    },
   })
 }
+
+// function api({ host = domain.zhost, url, method = 'post', params={}, callback, errorcallback }) {
+//   let self = this;
+//   params.rd_session = local({ type: 'get', key: 'rd_session' });
+//   let args = '';
+//   let datatype = method == 'get' ? 'application/json' : 'application/x-www-form-urlencoded';
+//   if (method == 'get') {
+//     args = buildStr(params);
+//     if (args != '') {
+//       args = '?' + args;
+//     }
+//   }
+//   wx.request({
+//     url: host + url + args,
+//     method: method,
+//     dataType: method == 'get' ? 'jsonp' : 'json',
+//     data: method == 'get' ? {} : params,
+//     header: {
+//       'content-type': datatype
+//     },
+//     success(res) {
+//       console.log(res)
+//       try{
+//         let data = res.data;
+//         if (typeof (res.data) == 'string' && !IsEmpty(res.data)){
+//           data = JSON.parse(res.data);
+//         }
+//         if(!IsEmpty(data.code)&&data.code!=200){
+//           wx.showToast({
+//             title: data.value,
+//             icon:'none'
+//           })
+//           return;
+//         }else{
+//           if (method == 'get') {
+//             callback(JSON.parse(res.data))
+//           } else {
+//             callback(res.data)
+//           }
+//         }
+//       }catch(e){
+//         console.warn(e)
+//       }
+      
+//     },
+//     fail(res) {
+//       console.error(res)
+//     }
+//   })
+// }
 /*
   type
   操作类型
+  同步存储
 */
 function local({ key, data, type }) {
   /*
@@ -235,6 +352,48 @@ function local({ key, data, type }) {
 }
 
 /*
+  type
+  操作类型
+  异步存储
+*/
+function asyLocal({ key, data, type }) {
+  /*
+    string key
+    本地缓存中指定的 key
+
+    Object|string data
+    需要存储的内容
+  */
+  switch (type) {
+    case 'save':
+      wx.setStorage({
+        key: key,
+        data: data,
+        success(res) {
+          return 1;
+        },
+        fail(res) {
+          console.log(res);
+          return 0;
+        }
+      ,
+      });
+      break;
+    case 'remove':
+      wx.removeStorage({
+        key: key,
+        success(res) {
+          return 1;
+        },
+        fail(res) {
+          console.log(res);
+          return 0;
+        }
+      })
+      break;
+  }
+}
+/*
   小程序登录
 */
 function programLogin(callback, type) {
@@ -242,22 +401,18 @@ function programLogin(callback, type) {
     wx.login({
       success: res => {
         //获取code后台处理
-        wx.request({
-          url: 'https://devweb1688.aiyongbao.com/wx/xcxSessionKey',
-          header: {
-            'content-type': 'application/json' // 默认值
+        api({ 
+          url:'/wx/xcxSessionKey',
+          params: { 
+            code: res.code
           },
-          data: {
-            code: res.code,
-          },
-          success(res) {
-            if (!IsEmpty(res.data)) {
-              local({ key: 'rd_session', data: res.data.rd_session, type: 'save' });
+          callback:(rsp)=>{
+            if (!IsEmpty(rsp)) {
+              local({ key: 'rd_session', data: rsp.rd_session, type: 'save' });
               callback();
             }
-            console.log(res)
           }
-        });
+        })
       }
     });
   }
@@ -278,35 +433,31 @@ function programLogin(callback, type) {
 
 
 function getUserInfo(callback) {
-  let rd_session = local({ type: 'get', key: 'rd_session' });
   wx.getSetting({
     success: res => {
       if (res.authSetting['scope.userInfo']) {
         // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
         wx.getUserInfo({
           success: res => {
-            console.log(res)
             let encryptedData = res.encryptedData;
             let iv = res.iv;
-            wx.request({
-              url: 'https://devweb1688.aiyongbao.com/wx/xcxuserinfo',
-              header: {
-                'content-type': 'application/json' // 默认值
-              },
-              data: {
+            api({
+              url:'/wx/xcxuserinfo',
+              params: {
                 encryptedData: encryptedData,
-                iv: iv,
-                rd_session: rd_session,
+                iv: iv
               },
-              success(res) {
-                if (IsEmpty(res.data)||IsEmpty(res.data.data) || IsEmpty(res.data.data.avatarUrl)) {
+              callback(res) {
+                console.log(res)
+                if (IsEmpty(res) || IsEmpty(res.data) || IsEmpty(res.data.avatarUrl)) {
                   console.error('登录信息冲突，需要强制刷新');
                   callback('reAuth');
                 } else {
                   var app = getApp();
                   res.data.encryptedData = encryptedData;
                   res.data.iv = iv;
-                  app.globalData.userInfo = { ...app.globalData.userInfo, ...res.data};
+                  app.globalData.userInfo = { data:{ ...app.globalData.userInfo, ...res.data
+            }};
                   callback(res);
                 }
               }
@@ -329,6 +480,13 @@ function choosepic(number, callback) {
     sizeType: ['original', 'compressed'],
     sourceType: ['album', 'camera'],//从
     success: function (res) {
+      //如果图片大于100KB进行压缩
+      if (res.tempFiles[0].size > 102400) {
+        wx.compressImage({
+          src: res.tempFilePaths[0],
+          quality: 80,
+        })
+      };
       callback(res)
     },
     fail: e => {
@@ -391,12 +549,9 @@ function downloadPic(fileID, callback) {
 */
 function getQrcode({ sence, page, callback }) {
   wx.getImageInfo({
-    src: 'https://devweb1688.aiyongbao.com/wx/xcxQrcode?str=' + sence + '&page=' + page,
+    src: 'https://zk1688.aiyongbao.com' + '/wx/xcxQrcode?str=' + sence + '&page=' + page,
     success: (res) => {
       callback(res.path);
-    },
-    complete:(res)=>{
-      console.log(res)
     }
   });
 }
@@ -458,15 +613,17 @@ function drawShopPic({ ava, sence, page, shopname, canvasID }) {
     }
   });
 }
-
-function getShopPic({ canvasId, callback, width, height }) {
+/**
+ * 将canvs转换成图片
+ */
+function getShopPic({ canvasId, callback,that, width, height }) {
   wx.canvasToTempFilePath({
-    x: 0,
-    y: 0,
-    width: width,
-    height: height,
-    destWidth: width,
-    destHeight: height,
+    // x: 0,
+    // y: 0,
+    // width: width,
+    // height: height,
+    // destWidth: width + 'rpx',
+    // destHeight: height + 'rpx',
     canvasId: canvasId,
     success: function (res) {
       callback(res.tempFilePath);
@@ -474,9 +631,11 @@ function getShopPic({ canvasId, callback, width, height }) {
     fail: function (res) {
       console.log(res)
     }
-  })
+  }, that)
 }
-
+/**
+ *    绘画cavans文字
+ */
 function drawText(ctx, str, initHeight, titleHeight, canvasWidth, initwidth) {
   var lineWidth = 0;
   var lastSubStrIndex = 0; //每次开始截取的字符串的索引
@@ -497,7 +656,11 @@ function drawText(ctx, str, initHeight, titleHeight, canvasWidth, initwidth) {
   titleHeight = titleHeight + 10;
   return titleHeight
 }
-function drawItemPic({ ava, sence, page, itemtitle, money, canvasID }) {
+
+/**
+ * 绘画商品分享图
+ */
+function drawItemPic({ ava, sence, page, itemtitle,shopname, money, canvasID, callback }) {
   wx.getSystemInfo({
     success: (res) => {
       let prwidth = Math.round(res.screenWidth * (548 / 750));//canvas占屏幕的宽比
@@ -505,36 +668,69 @@ function drawItemPic({ ava, sence, page, itemtitle, money, canvasID }) {
       let dotwidth = prwidth / 548;
       let dotheight = dotwidth;//利用百分比计算
       dotheight = dotwidth;
-      getQrcode({
-        sence: sence,
-        page: page,
-        callback: (res) => {
-          let qrcode = res;
-          wx.getImageInfo({
-            src: ava,
-            success(res) {
-              let pic = res.path;
-              const ctx = wx.createCanvasContext(canvasID);
-              // ctx.setShadow(1, 1, 2, 'black')
-              ctx.setFillStyle('white');
-              ctx.fillRect(0, 0, 547 * dotwidth, 973 * dotwidth)
-              // ctx.setShadow(0, 0, 0, 'black')
-
-              ctx.drawImage(pic, 19 * dotwidth, 1 * dotheight, 509 * dotwidth, 509 * dotheight);
-              ctx.drawImage(qrcode, 173 * dotwidth, 646 * dotheight, 200 * dotwidth, 200 * dotheight);
-              ctx.setFontSize(24 * dotwidth);
-              ctx.setFillStyle('black')
-              drawText(ctx, itemtitle, 537 * dotwidth, 24, 405 * dotwidth, 73 * dotwidth);
-              ctx.fillText('长按图片', 224 * dotwidth, 880 * dotheight);
-              ctx.fillText('识别图中小程序码查看详情', 128 * dotwidth, 924 * dotheight);
-              ctx.setFillStyle('red')
-              ctx.setFontSize(28 * dotwidth);
-              ctx.fillText(money, 73 * dotwidth, 607 * dotheight);
-              ctx.draw()
-            }
-          })
-        }
+      let promise1 = new Promise((resolve, reject) => {
+        getQrcode({
+          sence: sence,
+          page: page,
+          callback: (res) => {
+            console.log(res);
+            resolve(res);
+          }
+        })
+      });
+      let promise2 = new Promise((resolve, reject) => {
+        wx.getImageInfo({
+          src: ava,
+          success(res) {
+            resolve(res.path);
+          }
+        })
+      });
+      let promise3 = new Promise((resolve, reject) => {
+        wx.getImageInfo({
+          src: qurlimg + 'pic_logo.png',
+          success(res) {
+            resolve(res.path);
+          }
+        })
+      });
+      Promise.all([promise1, promise2, promise3])
+      .then((results) => {
+        console.log(results)
+        let qrcode = results[0];
+        let pic = results[1];
+        let toux = results[2];
+        const ctx = wx.createCanvasContext(canvasID);
+        // ctx.setShadow(1, 1, 2, 'black')
+        ctx.setFillStyle('white');
+        ctx.fillRect(0, 0, 547 * dotwidth, 973 * dotwidth)
+        // ctx.setShadow(0, 0, 0, 'black')
+        ctx.setFillStyle('black');
+        ctx.setFontSize(32 * dotwidth);
+        ctx.fillText(shopname, 215 * dotwidth, 100 * dotheight);
+        ctx.drawImage(toux, 117 * dotwidth, 45 * dotheight, 80 * dotwidth, 80 * dotheight);
+        ctx.drawImage(pic, 25 * dotwidth, 148 * dotheight, 500 * dotwidth, 550 * dotheight);
+        ctx.drawImage(qrcode, 50 * dotwidth, 800 * dotheight, 150 * dotwidth, 150 * dotheight);
+        ctx.setFontSize(24 * dotwidth);
+        ctx.setFillStyle('black')
+        drawText(ctx, itemtitle, 732 * dotwidth, 24, 328 * dotwidth, 25 * dotwidth);
+        ctx.setFillStyle('#666666')
+        ctx.fillText('长按图片', 354 * dotwidth, 850 * dotheight);
+        ctx.fillText('识别图中小程序码', 306 * dotwidth, 874 * dotheight);
+        ctx.fillText('查看详情', 354 * dotwidth, 898 * dotheight);
+        ctx.setFillStyle('red');
+        ctx.setFontSize(28 * dotwidth);
+        ctx.fillText(money, 420 * dotwidth, 732 * dotheight);
+        ctx.draw(true,function () {
+          console.log('绘制完成')
+          if (callback) {
+            callback();
+          }
+        })
       })
+      .catch((errResults) => {
+        console.error('信息获取失败');
+      }); 
     }
   });
 }
@@ -543,33 +739,41 @@ function checkAuth(type,callback) {
   programLogin(() => {
     getUserInfo((res) => {
       if (res == 'needAuth') {
-        navigate({
-          url: '/pages/login/login',
-          type: 'push',
-          params: { checkAuth: 1 }
-        });
+        if(callback) {
+          callback(res);
+        }
+        // navigate({
+        //   url: '/pages/login/login',
+        //   type: 'push',
+        //   params: { checkAuth: 1 }
+        // });
       } else if (res == 'reAuth') {
         checkAuth(1, callback)
       }else{
         if(callback){
-          callback();
+          callback(res);
         }
       }
     });
   }, type);//小程序登录
 } 
-module.exports.sayHello = sayHello;
-module.exports.navigate = navigate;
-module.exports.IsEmpty = IsEmpty;
-module.exports.api = api;
-module.exports.local = local;
-module.exports.programLogin = programLogin;
-module.exports.getUserInfo = getUserInfo;
-module.exports.choosepic = choosepic;
-module.exports.upload = upload;
-module.exports.downloadPic = downloadPic;
-module.exports.getQrcode = getQrcode;
-module.exports.drawShopPic = drawShopPic;
-module.exports.getShopPic = getShopPic;
-module.exports.drawItemPic = drawItemPic;
-module.exports.checkAuth = checkAuth;
+module.exports = {
+    saveImageToPhotosAlbum,
+    navigate,
+    IsEmpty,
+    api,
+    local,
+    asyLocal,
+    programLogin,
+    getUserInfo,
+    choosepic,
+    upload,
+    downloadPic,
+    getQrcode,
+    drawShopPic,
+    getShopPic,
+    drawItemPic,
+    checkAuth,
+    cloud
+    // testapi,
+};

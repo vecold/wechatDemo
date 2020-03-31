@@ -1,7 +1,8 @@
 //index.js
 const app = getApp()
 var cm = require('../../biz/login.js')//引用JS
-import { navigate, checkAuth } from '../../public/tools/index.js'
+import { navigate, checkAuth,api } from '../../public/tools/index.js'
+const regeneratorRuntime = require('../../public/tools/ren.js')
 Page({
   data: {
     avatarUrl: './user-unlogin.png',
@@ -12,6 +13,15 @@ Page({
 
   onLoad: function(opionts) {
     console.log(opionts)
+    api({
+      url: '/wx/getmemberId',
+      params: {
+        num_iid: '558623004775'
+      },
+      callback: (res) => {
+        console.log(res);
+      }
+    });
     if (!wx.cloud) {
       wx.redirectTo({
         url: '../chooseLib/chooseLib',
@@ -19,13 +29,22 @@ Page({
       return
     }
     // this.setData({ avatarUrl: app.globalData.userInfo.data.avatarUrl,auth:1});
-    // checkAuth(0);
+    checkAuth(0,(res)=>{
+      this.setData({ avatarUrl: app.globalData.userInfo.data.avatarUrl, auth: 1 });
+    });
   
   },
   
   showDemo: function (e){
     let demo = e.currentTarget.dataset.demo;
     let text = '' ;
+    if (demo=='18'){
+      navigate({
+        url: '/pages/backtest/backtest',
+        type: 'push'
+      });
+      return
+    }
     switch(demo){
       case '1':
         text = '条件渲染';

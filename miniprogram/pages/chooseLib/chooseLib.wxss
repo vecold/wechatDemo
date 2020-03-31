@@ -23,4 +23,12 @@
   height:974rpx;
   background-color: white;
 }
+.text_a,.text_b{
+  color: red;
+}
+.text_b{
+  font-size: 100rpx;
+  color: blue;
+}
+
 /* 画布绘制过程不能隐藏 但是又不能被用户看见 所以定位在用户看不到地方 */

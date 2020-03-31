@@ -1,0 +1,9 @@
+{
+  "triggers": [
+    {
+      "name": "orderTrigger",
+      "type": "timer",
+      "config": "0 */30 * * * * *"
+    }
+  ]
+}

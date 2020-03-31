@@ -1,0 +1,31 @@
+.movV{
+  width: 100%;
+  background-color:#FFF;
+  height: 350rpx;
+  padding: 30rpx;
+}
+.movA{
+  width: 150rpx;
+  height: 150rpx;
+}
+.plusV{
+  width: 150rpx;
+  height: 150rpx;
+  position: absolute;
+  background-color: #D8D8D8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.abtext{
+  font-size: 28rpx;
+  position: absolute;
+  right: 90rpx;
+  bottom: 30rpx;
+}
+.xv{
+  position: absolute;
+  width: 31rpx;
+  height: 31rpx;
+  z-index: 3;
+}

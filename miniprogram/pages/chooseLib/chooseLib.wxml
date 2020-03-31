@@ -37,6 +37,7 @@
     <text bindtap="destroy" data-type='1' wx:else>重新出现</text>
     <acom></acom>
     <text bindtap="getcomponent" >获取组件信息</text>
+    <text bindtap="changeworld" >变一下</text>
 </view>
 
 <view wx:if='{{demo==4}}'>
@@ -72,6 +73,8 @@
       <image src="{{imagePath}}" data-src="{{imagePath}}" mode="aspectFit" bindtap="previewImage"></image>
   </view>
   <button bindtap='picJude'>图片审核</button>
+  <button bindtap='bdJude'>百度识图</button>
+  <button bindtap='ossJude'>图片oss</button>
   <button bindtap='doDownload'>下载图片</button>
   <button bindtap='judemsg'>jaince</button>
   <button bindtap='getqrcode'>小程序二维码</button>
@@ -128,4 +131,28 @@
     <button type='default'>公历</button>
   </datepicker> 
   <button bindtap='helloclib'>ctrl+c</button>
+</view>
+<view wx:if='{{demo==16}}'>
+  <button bindtap='wxpay'>买呀0.01</button>
+  <button bindtap='cypay'>退呀0.01</button>
+  <button open-type='getUserInfo'>点我授权</button>
+  <text class='text_a'>text_a</text>
+  <text class='text_b'>text_b</text>
+  <button bindtap='cloudf'>云函数测试</button>
+</view>
+<view wx:if='{{demo==17}}'>
+  <text>酷炫动画测试</text>
+  <mainpic
+    bind:callback="callbackmin" 
+    picList = "{{movV}}"
+  />
+  <button bindtap='testgoods'>发布商品接口测试</button>
+  <button bindtap='testmini'>小程序跳转测试</button>
+</view>
+
+<view wx:if='{{demo==19}}'>
+  <text>确认收货工具</text>
+  <button bindtap='getfund'>获取</button>
+  <text>资金{{shopfund}}</text>
+  <button bindtap='updatefund'>更新</button>
 </view>

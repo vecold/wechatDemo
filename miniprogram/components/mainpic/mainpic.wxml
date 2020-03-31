@@ -1,0 +1,24 @@
+<movable-area class='movV'>
+  <block wx:for="{{movV}}" wx:key="{{index}}">
+    <image 
+      wx:if="{{item.index!=-1}}"
+      class='xv' 
+      style='left:{{item.x+72}}px;top:{{item.y-9}}px;'
+      src="https://q.aiyongbao.com/wechat/images/clpic2.png"
+      catchtap='delpic'
+      data-type='{{index}}'
+    />
+    <view wx:else></view>
+    <movable-view wx:if="{{item.index!=-1}}" bindtouchend='movend' bindchange="movchage" data-index='{{index}}' disabled="{{ami}}" class='movA' x="{{item.x}}" y="{{item.y}}" direction="all">
+    <image 
+      style='width:150rpx;height:150rpx;'
+      src="{{item.url}}"
+    />    
+  </movable-view>
+    <view class='plusV' catchtap='chooseImg' style='left:{{item.x}}px;top:{{item.y}}px;'  wx:else>
+      <text style='color:#fff;font-size:72rpx;'>+</text>
+    </view>
+  </block>
+  <text class='abtext'>{{count}}/5</text>
+</movable-area>
+

@@ -1,4 +1,5 @@
-import { api, IsEmpty } from '../public/tools/index.js';
+import { api, IsEmpty, cloud } from '../public/tools/index.js';
+import { Secret_Key } from '../public/tools/Secret.js';
 // 获取店铺，可通过店铺ID获取
 function getshops({page,shopid,callback}) {
   api({
@@ -59,7 +60,65 @@ function showCollect({wechatId, callback }) {
     }
   });
 }
+
+/**
+ *云函数更新 
+ */
+function upCloudFund({ type = '', nick = '', shopId = '', shop_funds = '', callback }) {
+  cloud({
+    name: 'shop_fund',
+    params: {
+      type: 'get',
+      nick: nick,
+      shopId: shopId,
+    },
+    callback: (res) => {
+      let funds = 0
+      if (IsEmpty(res.result.data)) {
+        funds = 0;
+      } else {
+        funds = res.result.data[0].shop_funds;
+        funds = Secret_Key(funds, 'appido', 'decryption');
+        funds = parseInt(funds);
+      }
+      if (type == 'get') {
+        callback(funds);
+        return;
+      }
+      shop_funds = parseInt(shop_funds) + funds;
+      shop_funds = Secret_Key(JSON.stringify(shop_funds), 'appido', 'encryption');
+      if (IsEmpty(res.result.data)) {
+        cloud({
+          name: 'shop_fund',
+          params: {
+            type: 'save',
+            nick: nick,
+            shopId: shopId,
+            shop_funds: shop_funds,
+          },
+          callback: (res) => {
+
+          }
+        });
+      } else {
+        cloud({
+          name: 'shop_fund',
+          params: {
+            type: 'update',
+            nick: nick,
+            shopId: shopId,
+            shop_funds: shop_funds,
+          },
+          callback: (res) => {
+
+          }
+        })
+      }
+    }
+  });
+}
 module.exports.getshops = getshops;
 module.exports.getitems = getitems;
 module.exports.collect = collect;
 module.exports.showCollect = showCollect;
+module.exports.upCloudFund = upCloudFund;

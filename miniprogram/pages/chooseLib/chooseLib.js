@@ -1,7 +1,7 @@
 // pages/chooseLib/chooseLib.js
-import { navigate,api, local, choosepic, upload, downloadPic, getQrcode, drawShopPic, getShopPic, drawItemPic } from '../../public/tools/index.js';
+import { navigate, api, local, choosepic, upload, downloadPic, getQrcode, drawShopPic, getShopPic, drawItemPic, cloud } from '../../public/tools/index.js';
 import { sendTempale, getTempale } from '../../biz/tempale.js';
-import { getshops, getitems, collect, showCollect } from '../../biz/getShops.js';
+import { getshops, getitems, collect, showCollect, upCloudFund } from '../../biz/getShops.js';
 
 Page({
 
@@ -9,6 +9,20 @@ Page({
    * 页面的初始数据
    */
   data: {
+    shopfund:0,
+    movV: JSON.stringify([
+      {
+        "id": 0,
+        "url": "wechat/90675/hello2019-03-20.jpeg",
+        "show": "0"
+      },
+      {
+        "id": 1,
+        "url": "wechat/90675/hello2019-03-20.jpeg",
+        "show": "1"
+      }
+    ]),
+    ami:0,
     array: [{
       message: 'foo',
     }, {
@@ -303,9 +317,9 @@ Page({
     let self = this;
     getShopPic({
       canvasId: 'myCanvas',
-      width:533,
-      height:665,
+      that: self,
       callback:(res)=>{
+        console.log(res)
         self.setData({
           prurl: res,
         })
@@ -426,13 +440,55 @@ Page({
       success:(res)=>{
         console.log(res.tempFilePaths[0]);
         wx.uploadFile({
-          url:'https://devweb1688.aiyongbao.com/wx/picJude',
+          url:'https://devwechat.aiyongbao.com/wxitem/picJude',
           filePath: res.tempFilePaths[0],
           name: 'file',
           header: {
             "Content-Type": "multipart/form-data"
           },
           success: function (res) { 
+            console.log(res)
+          }
+        });
+      }
+    });
+  },
+  bdJude: function (e) {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        console.log(res.tempFilePaths[0]);
+        wx.uploadFile({
+          url: 'https://devwechat.aiyongbao.com/wxitem/bdpic',
+          filePath: res.tempFilePaths[0],
+          name: 'file',
+          header: {
+            "Content-Type": "multipart/form-data"
+          },
+          success: function (res) {
+            console.log(res)
+          }
+        });
+      }
+    });
+  },
+  ossJude: function (e) {
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        console.log(res.tempFilePaths[0]);
+        wx.uploadFile({
+          url: 'https://devwechat.aiyongbao.com/wxitem/osspic?shopId=90675',
+          filePath: res.tempFilePaths[0],
+          name: 'file',
+          header: {
+            "Content-Type": "multipart/form-data"
+          },
+          success: function (res) {
             console.log(res)
           }
         });
@@ -461,11 +517,51 @@ Page({
       },
     })
   },
+  wxpay:function(e){
+    let app = getApp();
+    api({
+      url:'/wxpay/supplyOrder',
+      params: { total_fee: '1', device_info: 'xcx', openid: app.globalData.userInfo.data.openId},
+      callback:(rsp)=>{
+        console.log(rsp)
+        wx.requestPayment({
+          package: rsp.package,
+          paySign: rsp.paySign,
+          nonceStr: rsp.nonceStr,
+          signType: rsp.signType,
+          timeStamp: rsp.timeStamp+'',
+          success:(rsp)=>{
+            console.log(rsp)
+          },
+          fail:(rsp)=>{
+            console.warn(rsp)
+          }
+        });
+
+      }
+    });
+  },
+  cypay:function(e){
+    let app = getApp();
+    api({
+      url: '/wxpay/test',
+      params: { money: '30', openid: app.globalData.userInfo.data.openId },
+      callback: (rsp) => {
+        console.log(rsp)
+
+      }
+    });
+  },
   navtoindex:function(e){
     navigate({
       url: '/pages/index/index',
       type: 'push'
     });
+  },
+  pay:function(e){
+  },
+  changeworld:function(e){
+    this.setData({ dataFieldB:"china"});
   },
   helloclib:function(e){
     wx.setClipboardData({
@@ -482,5 +578,179 @@ Page({
         })
       }
     })
-  }
+  },
+  cloudf:function(e){
+    cloud({ 
+      name: 'shop_fund', 
+      params:{
+        type:'get',
+        nick: '大金刚',
+        shopId: 90657,
+        shop_funds: 17800
+      },
+      callback:(res)=>{
+        console.log(res)
+      }
+    })
+  },
+  // movchage:function(e){
+  //   const { movV, ami } = this.data;
+  //   let self = this;
+  //   if(ami == 1){
+  //     return;
+  //   }
+  //   const { x, y } = e.detail;
+  //   let ind = e.currentTarget.dataset.index;
+  //   this.ind = ind;
+  //   this.x = x;
+  //   this.y = y;
+  //   // let newmoV = movV;
+  //   // //换算为 90 90
+  //   // for (let i in movV){
+  //   //   if (i != ind){
+  //   //     let culx = Math.abs(x - movV[i].x);
+  //   //     let culy = Math.abs(y - movV[i].y);
+  //   //     if(culx<46&&culy<46){
+  //   //       //对换数据
+  //   //       let able = movV[i];
+  //   //       newmoV[i] = newmoV[ind];
+  //   //       newmoV[ind] = able;
+  //   //       this.setData({ movV: newmoV, ami:1});//暂时禁用
+  //   //       setTimeout((e)=>{
+  //   //         self.setData({ami: 0});
+  //   //       },800)
+  //   //       break;
+  //   //     }
+  //   //   }
+  //   // }
+  // },
+  testgoods:function(e){
+    // api({
+    //   url: '/wx/itemDetail',
+    //   params: {
+    //     num_iid:'3175295',
+    //   },
+    //   callback: (res) => {
+    //   }
+    // });
+    // return;
+    api({
+      url: '/wxgoods/pushgood',
+      params: { 
+        type: 'modi',//add 发布 modi 修改
+        data:JSON.stringify({
+          num_iid: '155358645890675',//modi必传
+          shopId:'90675',//店铺ID
+          shopName:'无敌大金刚',//店铺名字
+          title:'测试商品8888',//主标题
+          num:200,//库存
+          isPush:1,//是否上架
+          brandcat: 10986,//类目ID
+          props_name:'品牌:Leaduu;颜色:三合一;',//各个sku的规格描述组合，分号分开
+          tag_price: '666.00',//string标牌价
+          list_price: '169.00',//标牌价
+          cost_price: '169.00',//成本价
+          pic_path: JSON.stringify([
+            {
+              "id": 0,
+              "url": "wechat/90675/hello2019-03-20.jpeg",
+              "show": "0"
+            },
+            {
+              "id": 1,
+              "url": "img/ibank/2019/583/112/10649211385_149261721.jpg",
+              "show": ""
+            }
+          ]),//主图列表  商品修改中 id 即是顺序  show 即是是否展示
+          description: JSON.stringify([{
+            "id": 0,
+            "url": "https://iyvchart.oss-cn-hangzhou.aliyuncs.com/wechat/90675/hello2019-03-20.jpeg",
+            "show": "0"
+          },
+            {
+              "id": 1,
+              "url": "https://iyvchart.oss-cn-hangzhou.aliyuncs.com/wechat/90675/hello2019-03-20.jpeg",
+              "show": "1"
+            }
+          ]),//详情描述，逻辑同上
+          skus:JSON.stringify([
+            {
+              sku_title: "方头带瓶水壶;220",//sku标题，最好能与主商品prop_name对应
+              sku_tag_price: '60.00',//sku划线价
+              sku_list_price: '60.00',//sku标价
+              sku_inventory: 200,//sku库存
+              pic_path:'wechat/90675/hello2019-03-20.jpeg',//sku图片
+              sku_id:'15535864589325',//商品skuID modi时必须传
+            },
+          ]),
+        }),
+      },
+      callback: (res) => {
+        console.log(res)
+      }
+    });
+  },
+  callbackmin:function(e){
+    console.log(e)
+    let data = e.detail.data;
+  },
+  // movend:function(e){
+  //   const { movV, ami } = this.data;
+  //   let self = this;
+  //   const { x, y, ind } = this;
+  //   let newmoV = movV;
+  //   let flag = 1;
+  //   //换算为 90 90
+  //   for (let i in movV){
+  //     if (i != ind){
+  //       let culx = Math.abs(x - movV[i].x);
+  //       let culy = Math.abs(y - movV[i].y);
+  //       if(culx<46&&culy<46){
+  //         //对换数据
+  //         flag = 0;
+  //         let able = movV[i];
+  //         newmoV[i] = newmoV[ind];
+  //         newmoV[ind] = able;
+  //         this.setData({ movV: newmoV, ami:1});//暂时禁用
+  //         setTimeout((e)=>{
+  //           self.setData({ami: 0});
+  //         },800)
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   if (flag){
+  //     this.setData({ movV: newmoV, ami: 0 });
+  //   }
+  // },
+  testmini:function(e){
+    wx.navigateToMiniProgram({
+      appId: 'wx08c77d4e3bb67d91',
+      path: 'pages/index/index?vip=aiyong112233',
+      envVersion: 'trial',
+      success(res) {
+        // 打开成功
+      }
+    })
+  },
+  getfund:function(e){
+    let self = this;
+    upCloudFund({
+      type: 'get',
+      nick: '我们曾经走过的路',
+      shopId: JSON.stringify(115164+''),
+      callback: (res) => {
+        self.setData({ shopfund: res/100});
+        console.log(res);
+      }
+    });
+  },
+  updatefund: function (e) {
+    // upCloudFund({
+    //   nick: '我们曾经走过的路',
+    //   shopId: JSON.stringify(115164 + ''),
+    //   shop_funds: 1293,
+    // });
+  },
+  
 })
